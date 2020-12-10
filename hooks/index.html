@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<title>React Hooks Sharing - Percy Zhang</title>
+
+	<link rel="stylesheet" href="dist/reset.css" />
+	<link rel="stylesheet" href="dist/reveal.css" />
+	<link rel="stylesheet" href="dist/theme/black.css" id="theme" />
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme" />
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<div>
+					<img src="https://mk0synthacetw9y1jlr1.kinstacdn.com/app/uploads/2020/08/ReactHooks.png"
+						alt="react.js logo" style="
+                height: 180px;
+                margin: 0 auto 4rem auto;
+                background: transparent;
+              " class="demo-logo" />
+					<h3>React Hooks</h3>
+					<p>
+						<small>Shared by
+							<a href="mailto: percy.zhang@57blocks.com">Percy Zhang <sub>@57blocks.com</sub></a>
+						</small>
+					</p>
+				</div>
+			</section>
+			<section>
+				<ul>
+					<li>
+						React Hooks简介
+					</li>
+					<li>
+						React Hooks原理
+					</li>
+					<li>
+						React Hooks周边
+					</li>
+				</ul>
+			</section>
+			<section>
+				<iframe src="https://codesandbox.io/embed/boring-morning-fnxhn?fontsize=14&hidenavigation=1&theme=dark"
+					style="
+              width: 100%;
+              height: 500px;
+              border: 0;
+              border-radius: 4px;
+              overflow: hidden;
+            " title="boring-morning-fnxhn"
+					allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+					sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"></iframe>
+			</section>
+			<section>
+				<h3>什么是 Hook?</h3>
+			</section>
+			<section>
+				<h3>
+					Hooks 是一些可以让你在函数组件里“钩入” React state 及生命周期等特性的函数
+				</h3>
+				<p class="fragment">
+					Hook 不能在 class 组件中使用
+				</p>
+				<p class="fragment">
+					这使得你不使用 class 也能使用 React
+				</p>
+			</section>
+			<section>
+				<h3>
+					<p>常用的hooks函数</p>
+				</h3>
+					<ul><li>useState</li><li>useEffect</li></ul>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useState - 管理状态</h3>
+				<p>
+				<pre>
+						<code class="javascript">const [state, setState] = useState(initialState);</code>
+					</pre>
+				</p>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useState 注意点一</h3>
+				<p>
+					setState函数可以安全地从 useEffect 或 useCallback 的依赖列表中省略
+				</p>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useState 注意点二</h3>
+				<p>
+					如果setState时计算新的 state 需要依赖之前的state, 那可以将函数传递给 setState。
+				</p>
+				<p>
+				<pre><code class="jsx" data-trim data-line-numbers>
+					function Counter({initialCount}) {
+					  const [count, setCount] = useState(initialCount);
+					  return (
+						<div>
+						  Count: {count}
+						  <button onClick={()=> setCount(initialCount)}>Reset</button>
+						  <button onClick={()=> setCount(prevCount => prevCount - 1)}>-</button>
+						  <button onClick={()=> setCount(prevCount => prevCount + 1)}>+</button>
+						</div>
+					  );
+					}
+				</code></pre>
+				</p>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useState 注意点三 - 跳过State更新</h3>
+				<p>
+					如果setState函数返回值与当前 state 完全相同，则随后的渲染会被跳过。
+				</p>
+				<p class="fragment">
+					需要注意的是，React 可能仍需要在跳过渲染前渲染该组件。
+					<a target="_blank" href="https://github.com/facebook/react/issues/17672">Unexpected function component call using
+						useState </a>
+				</p>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useEffect - 管理副作用</h3>
+				<p>
+				<pre>
+						<code class="javascript">useEffect(didUpdate);</code>
+					</pre>
+				</p>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useEffect 清除effect</h3>
+				<pre><code class="hljs javascript" data-line-numbers>
+useEffect(() => {
+  const subscription = props.source.subscribe();
+  return () => {
+	// Clean up the subscription
+	subscription.unsubscribe();
+  };
+});
+				</code></pre>
+				  
+			</section>
+			<section>
+				<h3 style="text-transform: none">useEffect effect的执行时机</h3>
+				<p>
+					传给useEffect的函数会在浏览器完成布局与绘制之后被延迟调用
+				</p>
+				<p>
+					如果要在浏览器进行布局与绘制之前执行effect, 可以使用useLayoutEffect
+				</p>
+			</section>
+			<section>
+				<h3 style="text-transform: none">useEffect的条件执行</h3>
+				<p>
+					可以通过给useEffect 传递第二个参数，来指定effect执行的依赖项
+				</p>
+					<pre><code class="hljs javascript" data-line-numbers>
+useEffect(
+  () => {
+	const subscription = props.source.subscribe();
+	return () => {
+	  subscription.unsubscribe();
+	};
+  },
+  [props.source],
+);
+				</code></pre>
+			</section>
+			<section>
+				<h3>官方提供的Hooks列表</h3>
+				<ul>
+					<li>
+						useState
+					</li>
+					<li>
+						useEffect
+					</li>
+					<li>
+						useContext
+					</li>
+					<li>
+						useReducer
+					</li>
+					<li>
+						useCallback
+					</li>
+					<li>
+						useMemo
+					</li>
+					<li>
+						useRef
+					</li>
+					<li>
+						useImperativeHandle
+					</li>
+					<li>
+						useLayoutEffect
+					</li>
+					<li>
+						useDebugValue
+					</li>
+
+				</ul>
+			</section>
+			<section>
+				Hooks原理
+			</section>
+			<section>
+				<img src="https://cdn.netlify.com/e3dbea97adeafbc7d65e67ec60bf345ed989f5b6/4dbb8/img/blog/tweet-markdalgleish-hooks.jpg" width="500" style='height: 100%'/>
+			</section>
+			<section >
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/MulticoloredIllfatedLocations?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/SurprisedChocolateServicepack?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/NeglectedSociableLocks?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/FuchsiaStridentTransversal?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/VillainousFlawlessHexadecimal?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/ShamefulHonorablePolygon?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/WobblyPertinentPyramid?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/PersonalStaticComputer?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/SelfreliantDapperSystemresource?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<iframe height="800px" width="100%" src="https://repl.it/@blacktail/ChocolateItchyOpen64?lite=true" scrolling="no" frameborder="no" allowtransparency="true" allowfullscreen="true" sandbox="allow-forms allow-pointer-lock allow-popups allow-same-origin allow-scripts allow-modals"></iframe>
+			</section>
+			<section>
+				<h2><a href="https://reactjs.org/docs/hooks-rules.html">Rules of Hooks</a></h2>
+			</section>
+			<section>
+				<h2>
+					只在组件最顶层使用 Hook
+				</h2>
+				<p>
+					不要在循环，条件或嵌套函数中调用 Hook
+				</p>
+			</section>
+			<section>
+				<h2>
+					只在React函数中调用 Hook
+				</h2>
+				<h3>不要在普通的 JavaScript 函数中调用 Hook</h3>
+				<ul>
+					<li>在 React 的函数组件中调用 Hook</li>
+					<li>在自定义 Hook 中调用其他 Hook</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Hooks 周边</h2>
+			</section>
+			<section>
+				<h2><a href="https://www.npmjs.com/package/eslint-plugin-react-hooks" target="_blank">ESLint 插件</a></h2>
+			</section>
+			<section>
+				<h2>Hooks的库</h2>
+				<ul>
+					<li>
+						<a href="https://github.com/streamich/react-use">react-use</a>
+					</li>
+					<li>
+						<a href="https://ahooks.js.org">ahooks</a>
+					</li>
+					<li>
+						<a href="https://github.com/getify/TNG-Hooks">getify/TNG-Hooks</a>
+					</li>
+					<li>
+						<a href="https://recoiljs.org/">recoiljs</a>
+					</li>
+					<li>
+						<a href="https://github.com/immerjs/use-immer">useImmer</a>
+					</li>
+					<li>
+						...
+					</li>
+				</ul>
+			</section>
+			<section>
+				<h1>Q & A</h1>
+				<h2>Thanks!</h2>
+			</section>
+
+
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+		});
+	</script>
+</body>
+
+</html>
