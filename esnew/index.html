@@ -183,8 +183,12 @@
 						asyncFunc()
 					</code>
 					</pre>
+					<p><a href="https://mathiasbynens.be/notes/async-stack-traces"> why await beats Promise#then()</a></a></p>
 				</section>
 				<section>
+					<h1>
+					ES2018
+					</h1>
 					<p>Rest / Spread for Objects</p>
 					<pre>
 					<code data-trim data-noescape class="js" data-line-numbers>
@@ -211,6 +215,411 @@
 					</code>
 					</pre>
 				</section>
+				<section>
+					<p>Asynchronous Iteration</p>
+					<pre>
+					<code data-trim data-noescape class="js" data-line-numbers>
+						const asyncIterable = {
+							[Symbol.asyncIterator]() {
+							  return {
+							    i: 0,
+							    next() {
+							      if (this.i < 3) {
+								return Promise.resolve({ value: this.i++, done: false });
+							      }
+						      
+							      return Promise.resolve({ done: true });
+							    }
+							  };
+							}
+						};
+						      
+						(async function() {
+							for await (let num of asyncIterable) {
+							   console.log(num);
+							}
+						})();
+						
+					</code>
+					</pre>
+				</section>
+				<section>
+					<p>Asynchronous Iteration</p>
+					<pre>
+					<code data-trim data-noescape class="js" data-line-numbers>
+						async function* asyncGenerator() {
+							let i = 0;
+							while (i < 3) {
+							  yield i++;
+							}
+						}
+						      
+						(async function() {
+							for await (let num of asyncGenerator()) {
+							  console.log(num);
+							}
+						})();
+						
+						
+					</code>
+					</pre>
+				</section>
+				<section>
+					<p>Asynchronous Iteration</p>
+					<pre>
+					<code data-trim data-noescape class="js" data-line-numbers>
+						function* generator() {
+							yield 0;
+							yield 1;
+							yield Promise.resolve(2);
+							yield Promise.resolve(3);
+							yield 4;
+						}
+						      
+						(async function() {
+							for await (let num of generator()) {
+							  console.log(num);
+							}
+						})();
+					</code>
+					</pre>
+				</section>
+				<section>
+					<p>Promise.prototyp.finally()</p>
+					<pre>
+					<code data-trim data-noescape class="js" data-line-numbers>
+						const myPromise = new Promise((resolve, reject) => {
+							resolve()
+						})
+
+						myPromise
+							.then(() => {
+							  console.log('still working')
+							})
+							.catch(() => {
+							  console.log('there was an error')
+							})
+							.finally(() => {
+							  console.log('Done!')
+							})
+					</code>
+					</pre>
+				</section>
+				<section>
+					<p>RegExp features</p>
+					<p>s(dotAll) flag</p>
+					<pre>
+					<code data-trim data-noescape class="js" data-line-numbers>
+						;/foo.bar/s.test('foo\nbar')
+					</code>
+					</pre>
+				</section>
+				<section>
+					<p>RegExp features</p>
+					<p>(?&lt;name&gt;...)</p>
+					<pre>
+					<code data-trim data-noescape class="js" data-line-numbers>
+						let re = /(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/u
+						let result = re.exec('2015-01-02')
+						// result.groups.year === '2015';
+						// result.groups.month === '01';
+						// result.groups.day === '02';
+						// result[0] === '2015-01-02';
+						// result[1] === '2015';
+						// result[2] === '01';
+						// result[3] === '02';
+					</code>
+					</pre>
+				</section>
+				<section>
+					<h1>
+					ES2019
+					</h1>
+					<p>Array.prototype.flat()</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const letters = ['a', 'b', ['c', 'd', ['e', 'f']]]
+							// default depth of 1
+							letters.flat()
+							// ['a', 'b', 'c', 'd', ['e', 'f']]
+							// depth of 2
+							letters.flat(2)
+							// ['a', 'b', 'c', 'd', 'e', 'f']
+							// which is the same as executing flat with depth of 1 twice
+							letters.flat().flat()
+							// ['a', 'b', 'c', 'd', 'e', 'f']
+							// Flattens recursively until the array contains no nested arrays
+							letters.flat(Infinity)
+							// ['a', 'b', 'c', 'd', 'e', 'f']
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Array.prototype.flatMap()</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							let greeting = ['Greetings from', ' ', 'Vietnam']
+							// let's first try using a normal `map()` function
+							greeting.map((x) => x.split(' '))
+							// ["Greetings", "from"]
+							// ["", ""]
+							// ["Vietnam"]
+							greeting.flatMap((x) => x.split(' '))
+							// ["Greetings", "from", "", "", "Vietnam"]
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Object.fromEntries()</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const keyValueArray = [
+								['key1', 'value1'],
+								['key2', 'value2'],
+							]
+							const obj = Object.fromEntries(keyValueArray)
+							// {key1: "value1", key2: "value2"}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>String.prototype.trimStart() / .trimEnd()</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							let str = '    this string has a lot of whitespace   '
+							str.length
+							// 42
+							str = str.trimStart()
+							// "this string has a lot of whitespace   "
+							str.length
+							// 38
+							str = str.trimEnd()
+							// "this string has a lot of whitespace"
+							str.length
+							// 35
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Optional Catch Binding</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							// Before
+							try {
+								...
+							} catch(error) {
+								...
+							}
+							// ES2019
+							try {
+								...
+							} catch {
+								...
+							}
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Function​.prototype​.toString()</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							function sum(a, b) {
+								// perform a sum
+								return a + b
+							}
+							console.log(sum.toString())
+							// function sum(a, b) {
+							//   // perform a sum
+							//   return a + b;
+							// }
+							
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h1>ES2020</h1>
+					<p>Optional Chaining</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const student = {
+								name: 'Test',
+								age: 20,
+								address: {
+									street: {
+										number: 30,
+										name: 'Oxford'
+									}
+								}
+							}
+
+							const streetNumber = student?.address?.street?.number
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>globalThis</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							// browser
+							console.log(window === globalThis)
+
+							// node
+							console.log(global === globalThis)
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>BigInt</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const num = Number.MAX_SAFE_INTEGER
+							// 9007199254740991 (pow(2, 53) - 1 )
+
+							const bigNum = 9007199254740992n
+
+							++bigNum
+							// 9007199254740993n
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Dynamic Import</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+const ShoppingCart = lazy(
+  () => import(/* webpackChunkName: "shoppingcart" */ 'features/ShoppingCart')
+);
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Nullish Coalescing</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							false ?? 'some truthy value'
+							// false
+
+							undefined ?? 'some truthy value'
+							// some truthy value
+
+							null ?? 'some truthy value'
+							// some truthy value
+
+							NaN ?? 'some truthy value'
+							// NaN
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Promise.allSettled</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const myPromiseArray = [
+								Promise.resolve(100),
+								Promise.reject(null),
+								Promise.reject(new Error('Oh No'))
+							]
+
+							Promise.allSettled(myPromiseArray)
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>export * as moduleName from '...'</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							export * as utils from './utils.js'
+
+							// import * as utils from './utils.mjs'
+							// export { utils }
+
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Well defined for-in order</p>
+				</section>
+				<section>
+					<p>Private class fields</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							class ClassWithPrivateField {
+								#privateField;
+							      
+								constructor() {
+								  this.#privateField = 42;
+								}
+							}
+							      
+							class SubClass extends ClassWithPrivateField {
+								#subPrivateField;
+							      
+								constructor() {
+								  super();
+								  this.#subPrivateField = 23;
+								}
+							}
+							      
+							new SubClass();
+							// SubClass {#privateField: 42, #subPrivateField: 23}
+
+
+						</code>
+					</pre>
+
+				</section>
+				<section>
+					<h1>ES2021</h1>
+					<p>Underscores as Numeric Seperator</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const billion = 1000_000_000;
+							console.log(billion); // 1000000000
+
+							const trillion = 1000_000_000_000n;
+							console.log(trillion.toString()); // "1000000000000"
+
+
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>Logical Assignment Operator</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							var x = 1;
+							var y = 2;
+							x &&= y;
+							console.log(x); // 2
+							// x && (x = y);
+
+							x &&= y;
+							x ||= y;
+							x ??= y;
+						</code>
+					</pre>
+				</section>
+				<section>
+					<p>String.prototype.replaceAll()</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const str = "Backbencher sits at the Back";
+							const newStr = str.replaceAll("Back", "Front");
+							console.log(newStr); // "Frontbencher sits at the Front"
+						</code>
+					</pre>
+				</section>
+				
+
+
+
+
 			</div>
 		</div>
 
