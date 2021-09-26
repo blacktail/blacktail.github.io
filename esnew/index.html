@@ -8,7 +8,7 @@
 
 		<link rel="stylesheet" href="dist/reset.css">
 		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/moon.css">
+		<link rel="stylesheet" href="dist/theme/solarized.css">
 
 		<!-- Theme used for syntax highlighted code -->
 		<link rel="stylesheet" href="plugin/highlight/monokai.css">
@@ -17,7 +17,7 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-					<h1>Beyond ES6(ES2015)</h1>
+					<h2>Beyond ES6 & Some advanced react hooks introduction</h2>
 						<p>
 							<small>Shared by
 								<a href="mailto: percy.zhang@57blocks.com">Percy Zhang <sub>@57blocks.com</sub></a>
@@ -675,6 +675,149 @@ const ShoppingCart = lazy(
 						</code>
 					</pre>
 				</section>
+
+
+				<section>
+					<h1>Some Advanced React Hooks Introduction</h1>
+						<p>
+							<small>Shared by
+								<a href="mailto: percy.zhang@57blocks.com">Percy Zhang <sub>@57blocks.com</sub></a>
+							</small>
+						</p>
+
+
+				</section>
+				<section>
+						<p>
+							<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation" target="_blank">useCreation</a>
+						</p>
+						<p>What Problem to solve?</p>
+						
+
+				</section>
+				<section>
+					<p>
+						<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation" target="_blank">useCreation</a>
+					</p>
+					<p>Understanding from source code</p>
+					<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						export default function useCreation<T>(factory: () => T, deps: any[]) {
+							const { current } = useRef({
+							  deps,
+							  obj: undefined as undefined | T,
+							  initialized: false,
+							});
+
+							if (current.initialized === false || !depsAreSame(current.deps, deps)) {
+							  current.deps = deps;
+							  current.obj = factory();
+							  current.initialized = true;
+							}
+							return current.obj as T;
+						}
+						
+						
+					</code>
+
+					</pre>
+
+			</section>
+		<section>
+			<p>
+				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-persist-fn" target="_blank">usePersistFn</a>
+			</p>
+			<p ><a href="https://reactjs.org/docs/hooks-faq.html#how-to-read-an-often-changing-value-from-usecallback" target="_blank">What Problem to solve?</a></p>
+
+		</section>
+		<section>
+			<p>
+				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-persist-fn" target="_blank">usePersistFn</a>
+			</p>
+			<p>Understanding from source code</p>
+			<pre>
+			<code data-trim data-noescape  class="js" data-line-numbers>
+
+				function usePersistFn<T extends noop>(fn: T) {
+					const fnRef = useRef<T>(fn);
+					fnRef.current = fn;
+				      
+					const persistFn = useRef<T>();
+					if (!persistFn.current) {
+					  persistFn.current = function (...args) {
+					    return fnRef.current!.apply(this, args);
+					  } as T;
+					}
+				      
+					return persistFn.current!;
+				}
+			
+			</code>
+
+			</pre>
+
+		</section>
+		<section>
+			<p>
+				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">useSafeState</a>
+			</p>
+			<p ><a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">What Problem to solve?</a></p>
+
+		</section>
+		<section>
+			<p>
+				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">useSafeState</a>
+			</p>
+			<p>Understanding from source code</p>
+			<pre>
+			<code data-trim data-noescape  class="js" data-line-numbers>
+				function useSafeState(initialState?) {
+					const unmountedRef = useUnmountedRef();
+					const [state, setState] = React.useState(initialState);
+
+					const setCurrentState = React.useCallback((currentState) => {
+					  /** 如果组件已经卸载则不再更新 state */
+					  if (unmountedRef.current) return;
+					  setState(currentState);
+					}, []);
+				      
+					return [state, setCurrentState] as const;
+				}
+			
+			</code>
+
+			</pre>
+
+		</section>
+		<section>
+			<p>
+				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">useSafeState</a>
+			</p>
+			<p>Understanding from source code</p>
+			<pre>
+			<code data-trim data-noescape  class="js" data-line-numbers>
+				const useUnmountedRef = () => {
+					const unmountedRef = useRef(false);
+					useEffect(() => {
+					  unmountedRef.current = false;
+				      
+					  return () => {
+					    unmountedRef.current = true;
+					  };
+					}, []);
+					return unmountedRef;
+				};
+			
+			</code>
+
+			</pre>
+
+		</section>
+		<section>
+			<h1>Thank You!</h1>
+			<h3>Dicusstion Q & A</h3>
+		</section>
+				
 				
 
 
@@ -692,7 +835,11 @@ const ShoppingCart = lazy(
 			// - https://revealjs.com/initialization/
 			// - https://revealjs.com/config/
 			Reveal.initialize({
+				controls: true,
+				progress: true,
+				center: true,
 				hash: true,
+
 
 				// Learn about plugins: https://revealjs.com/plugins/
 				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
