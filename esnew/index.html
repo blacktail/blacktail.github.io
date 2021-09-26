@@ -631,6 +631,50 @@ const ShoppingCart = lazy(
 						</li>
 					</ul>
 				</section>
+				<section>
+					<h2>Some best practices</h2>
+					<p>Avoid verifying objects like this</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							console.log(parent && parent.child1 && parent.child1.child2 && parent.child1.child2.child3)
+						</code>
+					</pre>
+					<p>But should use optional chaining</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							console.log(parent?.child1?.child2?.child3)
+						</code>
+					</pre>
+					<p>Optional chaining also works on array</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const iAmArray = [
+								'apple',
+								'pear'
+							]
+
+							console.log(iAmArray?.[3])
+						</code>
+					</pre>
+
+				</section>
+				<section>
+					<p>Avoid verifying null and undefined like following</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							let defaultOptionalNumber = optionalNumber
+							if (optionalNumber === null || optionalNumber === undefined) {
+								defaultOptionalNumber = 0.5
+							}
+						</code>
+					</pre>
+					<p>We can use  Nullish coalescing operator</p>
+					<pre>
+						<code data-trim data-noescape class="js" data-line-numbers>
+							const defaultOptionalNumber = optionalNumber ?? 0.5
+						</code>
+					</pre>
+				</section>
 				
 
 
