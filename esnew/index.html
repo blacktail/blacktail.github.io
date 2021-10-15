@@ -181,6 +181,7 @@
 				</section>
 				<section>
 					<p>Object.getOwnPropertyDescriptors()</p>
+					<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyDescriptors">Reference</a></p>
 					<pre>
 					<code data-trim data-noescape class="js" data-line-numbers>
 						const myObj = {
@@ -215,6 +216,9 @@
 						// 3
 						console.log(Atomics.load(uint8, 0))
 						// 3
+
+						var sab = new SharedArrayBuffer(1024);
+						worker.postMessage(sab);
 					</code>
 					</pre>
 				</section>
@@ -224,7 +228,7 @@
 					<code data-trim data-noescape class="js" data-line-numbers>
 						async function asyncFunc() {
 							try {
-								let response = await fetch('http:your-url')
+								const response = await fetch('http:your-url')
 							} catch (err) {
 								console.log(err)
 							}
@@ -247,7 +251,8 @@
 							c: 5,
 							d: 8,
 						}
-						// we use the rest operator to grab everything else left in the object.
+						// we use the rest operator to grab 
+						// everything else left in the object.
 						let { a, b, ...z } = myObj
 						console.log(a) // 1
 						console.log(b) // 3
@@ -591,9 +596,6 @@ const ShoppingCart = lazy(
 					</pre>
 				</section>
 				<section>
-					<p>Well defined for-in order</p>
-				</section>
-				<section>
 					<p>Private class fields</p>
 					<pre>
 						<code data-trim data-noescape class="js" data-line-numbers>
@@ -733,42 +735,7 @@ const ShoppingCart = lazy(
 
 
 				</section>
-				<section>
-						<p>
-							<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation" target="_blank">useCreation</a>
-						</p>
-						<p>What Problem to solve?</p>
-						
-
-				</section>
-				<section>
-					<p>
-						<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation" target="_blank">useCreation</a>
-					</p>
-					<p>Understanding from source code</p>
-					<pre>
-					<code data-trim data-noescape  class="js" data-line-numbers>
-						export default function useCreation<T>(factory: () => T, deps: any[]) {
-							const { current } = useRef({
-							  deps,
-							  obj: undefined as undefined | T,
-							  initialized: false,
-							});
-
-							if (current.initialized === false || !depsAreSame(current.deps, deps)) {
-							  current.deps = deps;
-							  current.obj = factory();
-							  current.initialized = true;
-							}
-							return current.obj as T;
-						}
-						
-						
-					</code>
-
-					</pre>
-
-			</section>
+				
 		<section>
 			<p>
 				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-persist-fn" target="_blank">usePersistFn</a>
@@ -858,6 +825,11 @@ const ShoppingCart = lazy(
 
 			</pre>
 
+		</section>
+		<section>
+			<h1>Summary</h1>
+			<p>注重细节</p>
+			<p>平凡的代码可能并不那么平凡</p>
 		</section>
 		<section>
 			<h1>Thank You!</h1>
