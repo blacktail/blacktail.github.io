@@ -1,45 +1,114 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Advanced Hooks</title>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/moon.css">
+	<title>Advanced Hooks</title>
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>
-					<h1>Some Advanced React Hooks Introduction</h1>
-						<p>
-							<small>Shared by
-								<a href="mailto: percy.zhang@57blocks.com">Percy Zhang <sub>@57blocks.com</sub></a>
-							</small>
-						</p>
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/moon.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h1>Advanced React Hooks </h1>
+				<p>
+					<small>Shared by
+						<a href="mailto: percy.zhang@57blocks.com">Percy Zhang
+							<sub>@57blocks.com</sub></a>
+					</small>
+				</p>
 
 
-				</section>
-				<section>
-						<p>
-							<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation" target="_blank">useCreation</a>
-						</p>
-						<p>What Problem to solve?</p>
-						
+			</section>
+			<section>
+				<p>
+					<a href="https://reactjs.org/docs/hooks-intro.html"
+						target="_blank">为什么要有Hooks</a>
+				</p>
+				<ul>
+					<li>组件化思想</li>
+					<li>去Class化</li>
+					<li>组合优于继承</li>
+				</ul>
+			</section>
+			<section>
+				<p>
+					<a href="https://blacktail.github.io/hooks/" target="_blank">Hooks的原理</a>
+				</p>
+			</section>
+			<section>
+				<p>
+					<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation"
+						target="_blank">React 自带的Hooks</a>
+				</p>
+				<ul style="max-height: 600px; overflow: auto;">
+					<li>----- Basic Hooks -----</li>
+					<li>
+						useState
+					</li>
+					<li>
+						useEffect
+					</li>
+					<li>
+						useContext
+					</li>
+					<li>----- Additional Hooks -----</li>
+					<li>
+						useReducer
+					</li>
+					<li>
+						useCallback
+					</li>
+					<li>
+						useMemo
+					</li>
+					<li>
+						useRef
+					</li>
+					<li>
+						useImperativeHandle
+					</li>
+					<li>
+						useLayoutEffect
+					</li>
+					<li>
+						useDebugValue
+					</li>
+					<li>----- React 18 Hooks -----</li>
+					<li>useSyncExternalStore (for Tearing 🐶 )</li>
+					<li>useId</li>
+					<li>useInsertionEffect</li>
 
-				</section>
-				<section>
-					<p>
-						<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation" target="_blank">useCreation</a>
-					</p>
-					<p>Understanding from source code</p>
-					<pre>
+				</ul>
+			</section>
+			<section>
+				<p>
+					<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-creation"
+						target="_blank">Hooks相关的库</a>
+				</p>
+				<ul>
+					<li><a href="https://github.com/streamich/react-use"
+							target="_blank">react-use</a></li>
+					<li><a href="https://ahooks.js.org/" target="_blank">ahooks</a></li>
+
+				</ul>
+			</section>
+			<section>
+				<p>
+					<a href="https://ahooks.js.org/zh-CN/hooks/use-creation"
+						target="_blank">useCreation</a>
+				</p>
+				<p>Understanding from source code</p>
+				<pre>
 					<code data-trim data-noescape  class="js" data-line-numbers>
 						export default function useCreation<T>(factory: () => T, deps: any[]) {
 							const { current } = useRef({
@@ -62,123 +131,153 @@
 					</pre>
 
 			</section>
-		<section>
-			<p>
-				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-persist-fn" target="_blank">usePersistFn</a>
-			</p>
-			<p ><a href="https://reactjs.org/docs/hooks-faq.html#how-to-read-an-often-changing-value-from-usecallback" target="_blank">What Problem to solve?</a></p>
-
-		</section>
-		<section>
-			<p>
-				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-persist-fn" target="_blank">usePersistFn</a>
-			</p>
-			<p>Understanding from source code</p>
-			<pre>
+			<section>
+				<p>
+					<a href="https://ahooks.js.org/zh-CN/hooks/use-memoized-fn"
+						target="_blank">useMemoizedFn</a>
+				</p>
+				<p>Understanding from source code</p>
+				<pre>
 			<code data-trim data-noescape  class="js" data-line-numbers>
 
-				function usePersistFn<T extends noop>(fn: T) {
-					const fnRef = useRef<T>(fn);
-					fnRef.current = fn;
-				      
-					const persistFn = useRef<T>();
-					if (!persistFn.current) {
-					  persistFn.current = function (...args) {
-					    return fnRef.current!.apply(this, args);
-					  } as T;
-					}
-				      
-					return persistFn.current!;
-				}
+	function useMemoizedFn<T extends noop>(fn: T) {
+	if (process.env.NODE_ENV === 'development') {
+	  if (typeof fn !== 'function') {
+	    console.error(`useMemoizedFn expected parameter is a function, got ${typeof fn}`);
+	  }
+	}
+      
+	const fnRef = useRef<T>(fn);
+      
+	// why not write `fnRef.current = fn`?
+	// https://github.com/alibaba/hooks/issues/728
+	fnRef.current = useMemo(() => fn, [fn]);
+      
+	const memoizedFn = useRef<T>();
+	if (!memoizedFn.current) {
+	  memoizedFn.current = function (...args) {
+	    // eslint-disable-next-line @typescript-eslint/no-invalid-this
+	    return fnRef.current.apply(this, args);
+	  } as T;
+	}
+      
+	return memoizedFn.current;
+      }
+
 			
 			</code>
 
 			</pre>
 
-		</section>
-		<section>
-			<p>
-				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">useSafeState</a>
-			</p>
-			<p ><a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">What Problem to solve?</a></p>
-
-		</section>
-		<section>
-			<p>
-				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">useSafeState</a>
-			</p>
-			<p>Understanding from source code</p>
-			<pre>
+			</section>
+			<section>
+				<p>
+					<a href="https://ahooks.js.org/zh-CN/hooks/use-reactive"
+						target="_blank">useReactive</a>
+				</p>
+				<p>Understanding from source code</p>
+				<pre>
 			<code data-trim data-noescape  class="js" data-line-numbers>
-				function useSafeState(initialState?) {
-					const unmountedRef = useUnmountedRef();
-					const [state, setState] = React.useState(initialState);
-
-					const setCurrentState = React.useCallback((currentState) => {
-					  /** 如果组件已经卸载则不再更新 state */
-					  if (unmountedRef.current) return;
-					  setState(currentState);
+				function useReactive(initialState: S): S {
+					const update = useUpdate();
+					const stateRef = useRef(initialState);
+				      
+					const state = useCreation(() => {
+					  return observer(stateRef.current, () => {
+					    update();
+					  });
 					}, []);
 				      
-					return [state, setCurrentState] as const;
-				}
+					return state;
+				      }
 			
 			</code>
 
 			</pre>
 
-		</section>
-		<section>
-			<p>
-				<a href="https://ahooks.js.org/zh-CN/hooks/advanced/use-safe-state" target="_blank">useSafeState</a>
-			</p>
-			<p>Understanding from source code</p>
-			<pre>
-			<code data-trim data-noescape  class="js" data-line-numbers>
-				const useUnmountedRef = () => {
-					const unmountedRef = useRef(false);
-					useEffect(() => {
-					  unmountedRef.current = false;
-				      
-					  return () => {
-					    unmountedRef.current = true;
-					  };
-					}, []);
-					return unmountedRef;
-				};
+			</section>
+			<section>
+				<p>useReactive DEMO</p>
+				<a href="https://codesandbox.io/s/7iwy5?file=/App.tsx"
+					target="_blank">https://codesandbox.io/s/7iwy5?file=/App.tsx</a>
+			</section>
+
+			<section>
+				<h3>React后续发展展望</h3>
+				<h4>去class化，在函数式咱上越走越远</h4>
+					<ul>
+						<li>
+							New featur不断以Hooks的方式发布出来
+
+						</li>
+						<li>
+							围绕Hooks的各种体验优化，比如React Forget (React without memo)
+
+						</li>
+						<li>
+							社区中更多更好的Hooks Utility, 封装程度和抽象程度不断提高
+
+						</li>
+					</ul>
+			</section>
 			
-			</code>
+			<section>
+				<h3>Server Side Rendering</h3>
+					<ul>
+						<li>
+							Streaming SSR & Selective Hydration based on Suspense
 
-			</pre>
+						</li>
+						<li>
+							Next.js
+						</li>
+					</ul>
+			</section>
+			<section>
+				<h3>Concurrent Mode转正？？</h3>
+				<p>围绕concurrent mode的周边更新，特别是三方库的更新和挑战</p>
+					<ul>
+						<li>
+							纯基于Hooks的状态管理库
 
-		</section>
-				
-				
+						</li>
+						<li>
+							OS化，react定位向框架转变(有点点苗头)
+						</li>
+					</ul>
+			</section>
+			<section>
+				Thank you
+			</section>
 
 
 
 
-			</div>
+
+
+
 		</div>
+	</div>
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				center: true,
-				hash: true,
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
 
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
 </html>
