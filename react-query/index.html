@@ -1,0 +1,368 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>React Query</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/white.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h1>React Query</h1>
+				<p>
+					<small>Shared by
+						<a href="mailto: zhangping1@mokahr.com">
+							<sub>zhangping1@mokahr.com</sub></a>
+					</small>
+				</p>
+
+
+			</section>
+			<section>
+				<p>
+					<a href="https://tanstack.com/query/v4/docs/overview"
+						target="_blank">谈谈组件状态管理的类别</a>
+				</p>
+				<ul>
+					<li>Component State
+						<ul>
+							<li>
+								useState
+							</li>
+							<li>
+								useReducer
+							</li>
+						</ul>
+
+					</li>
+					<li>Application State
+						<ul>
+							<li>
+								context + hooks
+							</li>
+							<li>
+								redux + redux toolkit / dva
+							</li>
+							<li>
+								mobx
+							</li>
+							<li>
+								recoil
+							</li>
+						</ul>
+					</li>
+					
+				</ul>
+			</section>
+			<section>
+				<p>
+					<a href="https://tanstack.com/query/v4/docs/overview"
+						target="_blank">谈谈组件状态管理的类别</a>
+				</p>
+				<ul>
+					<li>
+						Server State
+						<ul>
+							<li><b style="color:red">react-query</b></li>
+							<li>swr</li>
+							<li>apollo client</li>
+							<li>urql</li>
+						</ul>
+					</li>
+					<li>
+						Form State
+						<ul>
+							<li>React Hook Form</li>
+							<li>Formik</li>
+							<li>Formily</li>
+							<li>React Final Form</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section>
+				<p>为什么要有服务端状态管理？</p>
+				<ul>
+					<li>数据缓存</li>
+					<li>消除重复请求</li>
+					<li>过期数据更新与感知</li>
+					<li>性能优化，例如分页，数据懒加载</li>
+					<li>服务端状态内存管理，垃圾回收</li>
+					<li>请求结果的结构化共享(structural sharing)</li>
+					<li>......</li>
+				</ul>
+			</section>
+			<section style="height: 600px;">
+				<p>
+					First look at react query
+				</p>
+				<iframe src="https://codesandbox.io/embed/github/tannerlinsley/react-query/tree/main/examples/react/simple?fontsize=14&hidenavigation=1&theme=dark"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="@tanstack/query-example-react-simple"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
+			</section>
+			<section>
+				<p>
+					Queries
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+					import { useQuery } from '@tanstack/react-query'
+
+					function App() {
+						const result = useQuery(['todos'], fetchTodoList)
+					}
+						
+					</code>
+
+					</pre>
+					<ul>
+						<li>A unique query key (for refetching, caching, sharing)</li>
+						<li>A function returns a promise
+							<ul>
+								<li>resolves the data, or</li>
+								<li>throws an error</li>
+							</ul>
+
+						</li>
+					</ul>
+			</section>
+			<section>
+				<p>
+					About query result properties
+				</p>
+				<ul>
+					<li>
+						status
+					</li>
+					<li>
+						error
+					</li>
+					<li>
+						data
+					</li>
+					<li>
+						isLoading (status === 'loading')
+					</li>
+					<li>
+						isError (status === 'error')
+					</li>
+					<li>
+						isSuccess (status === 'success')
+					</li>
+				</ul>
+			</section>
+			<section>
+				<p>
+					Demo
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="jsx" data-line-numbers>
+						function Todos() {
+							const { isLoading, isError, data, error } = 
+							  useQuery(['todos'], fetchTodoList)
+						  
+							if (isLoading) {
+							  return &lt;span&gt;Loading...&lt;/span&gt;
+							}
+						  
+							if (isError) {
+							  return &lt;span&gt;Error: {error.message}&lt;/span&gt;
+							}
+						  
+							// We can assume by this point that `isSuccess === true`
+							return (
+							  &lt;ul&gt;
+								{data.map(todo => (
+									&lt;li&gt; key={todo.id}>{todo.title}&lt;/li&gt;
+								))}
+							  &lt;/ul&gt;
+							)
+						  }
+					</code>
+
+					</pre>
+			</section>
+			<section>
+				<p>Query Keys</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						// an array with constants values
+						useQuery(['todos'], ...)
+
+						// Something else, whatever!
+						useQuery(['something', 'special'], ...)
+					</code>
+				</pre>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						// An individual todo
+						useQuery(['todo', 5], ...)
+
+						// An individual todo in a "preview" format
+						useQuery(['todo', 5, { preview: true }], ...)
+
+						// A list of todos that are "done"
+						useQuery(['todos', { type: 'done' }], ...)
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Query Key 的hash是确定的</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						useQuery(['todos', { status, page }], ...)
+						useQuery(['todos', { page, status }], ...)
+						useQuery(['todos', { page, status, other: undefined }], ...)
+					</code>
+				</pre>
+
+				<p><small>Query Key中通常会包含变量来标识唯一的query</small> </p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function Todos({ todoId }) {
+							const result = useQuery(['todos', todoId], () => fetchTodoById(todoId))
+						}
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Manual Parallel Queries</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function App () {
+							// The following queries will execute in parallel
+							const usersQuery = useQuery(['users'], fetchUsers)
+							const teamsQuery = useQuery(['teams'], fetchTeams)
+							const projectsQuery = useQuery(['projects'], fetchProjects)
+							...
+						}
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Dynamic Parallel Queries</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function App({ users }) {
+							const userQueries = useQueries({
+							  queries: users.map(user => {
+								return {
+								  queryKey: ['user', user.id],
+								  queryFn: () => fetchUserById(user.id),
+								}
+							  })
+							})
+						}
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Dependent Queries</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+					// Get the user
+					const { data: user } = useQuery(['user', email], getUserByEmail)
+
+					const userId = user?.id
+
+					// Then get the user's projects
+					const { status, fetchStatus, data: projects } = useQuery(
+						['projects', userId],
+						getProjectsByUser,
+						{
+							// The query will not execute until the userId exists
+							enabled: !!userId,
+						}
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Lazy Queries</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function Todos() {
+							const [filter, setFilter] = React.useState('')
+						  
+							const { data } = useQuery(
+							  ['todos', filter],
+							  () => fetchTodos(filter),
+							  {
+								// ⬇️ disabled as long as the filter is empty
+								enabled: !!filter
+							  }
+							)
+						  
+							return (
+								&lt;div&gt;
+								  // 🚀 applying the filter will enable and execute the query
+								  &lt;FiltersForm onApply={setFilter} /&gt;
+								  {data && &lt;TodosTable data={{data}} /&gt;}
+								&lt;/div&gt;
+							)
+						  }
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Query Retries</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						import { useQuery } from '@tanstack/react-query'
+
+						// Make a specific query retry a certain number of times
+						const result = useQuery(['todos', 1], fetchTodoListPage, {
+							retry: 10, // Will retry failed requests 10 times before displaying an error
+						})
+
+					</code>
+				</pre>
+			</section>
+			<section>
+				Thank You
+			</section>
+
+
+
+
+
+
+
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+		});
+	</script>
+</body>
+
+</html>
