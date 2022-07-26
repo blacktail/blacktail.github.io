@@ -222,6 +222,8 @@
 			</section>
 			<section>
 				<p>Query Key 的hash是确定的</p>
+				<p>hashed deterministically!</p>
+				<small>以下的key是等价的</small>
 				<pre>
 					<code data-trim data-noescape  class="js" data-line-numbers>
 						useQuery(['todos', { status, page }], ...)
@@ -330,6 +332,240 @@
 
 					</code>
 				</pre>
+			</section>
+			<section>
+				<p>Pagination</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						const result = useQuery(['projects', page], fetchProjects)
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Infinite Queries</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						A Demo in hcm-h5-umi
+					</code>
+					<a href="https://gitlab.mokahr.com/TryMoka/hcm-h5-umi/-/blob/master/src/pages/newTeamAttendance/viewAllByDay/ViewAllByDay.tsx#L61" target="_blank">
+						Demo
+					</a>
+				</pre>
+			</section>
+			<section>
+				<p>Placeholder Data</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function Todos() {
+							const result = useQuery(['todos'], () => fetch('/todos'), {
+							  placeholderData: placeholderTodos,
+							})
+						  }
+					</code>
+				</pre>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function Todo({ blogPostId }) {
+							const result = useQuery(['blogPost', blogPostId], () => fetch(`/blogPosts/${blogPostId}`), {
+							  placeholderData: () => {
+								// Use the smaller/preview version of the blogPost from the 'blogPosts' query as the placeholder data for this blogPost query
+								return queryClient
+								  .getQueryData(['blogPosts'])
+								  ?.find(d => d.id === blogPostId)
+							  },
+							})
+						  }
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>Mutations</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						function App() {
+							const mutation = useMutation(newTodo => {
+							  return axios.post('/todos', newTodo)
+							})
+						  
+							return (
+							  &lt;div&gt;
+								{mutation.isLoading ? (
+								  'Adding todo...'
+								) : (
+								  &lt;&gt;
+									{mutation.isError ? (
+									  &lt;div&gt;An error occurred: {mutation.error.message}&lt;/div&gt;
+									) : null}
+						  
+									{mutation.isSuccess ? &lt;div&gt;Todo added!&lt;/div&gt; : null}
+						  
+									&lt;button
+									  onClick={() => {
+									    mutation.mutate({ id: new Date(), title: 'Do Laundry' })
+									  }}
+									&gt;
+									  Create Todo
+									&lt;/button&gt;
+								  &lt;/&gt;
+								)}
+							  &lt;/div&gt;
+							)
+						  }
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>
+					Query Invalidation
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						// Invalidate every query in the cache
+						queryClient.invalidateQueries()
+						// Invalidate every query with a key that starts with `todos`
+						queryClient.invalidateQueries(['todos'])
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>
+					Invalidation from Mutations
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+const queryClient = useQueryClient()
+
+// When this mutation succeeds, invalidate any queries with the `todos` or `reminders` query key
+const mutation = useMutation(addTodo, {
+  onSuccess: () => {
+    queryClient.invalidateQueries(['todos'])
+    queryClient.invalidateQueries(['reminders'])
+  },
+})
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>
+					Updates from Mutation Responses
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+const queryClient = useQueryClient()
+
+const mutation = useMutation(editTodo, {
+  onSuccess: data => {
+    queryClient.setQueryData(['todo', { id: 5 }], data)
+  }
+})
+
+mutation.mutate({
+  id: 5,
+  name: 'Do the laundry',
+})
+
+// The query below will be updated with the response from the
+// successful mutation
+const { status, data, error } = useQuery(['todo', { id: 5 }], fetchTodoById)
+
+// custom hooks
+const useMutateTodo = () => {
+	const queryClient = useQueryClient()
+  
+	return useMutation(editTodo, {
+	  // Notice the second argument is the variables object that the `mutate` function receives
+	  onSuccess: (data, variables) => {
+	    queryClient.setQueryData(['todo', { id: variables.id }], data)
+	  },
+	})
+}
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>
+					Optimistic Updates (乐观更新)
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+const queryClient = useQueryClient()
+
+useMutation(updateTodo, {
+  // When mutate is called:
+  onMutate: async newTodo => {
+    // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+    await queryClient.cancelQueries(['todos'])
+
+    // Snapshot the previous value
+    const previousTodos = queryClient.getQueryData(['todos'])
+
+    // Optimistically update to the new value
+    queryClient.setQueryData(['todos'], old => [...old, newTodo])
+
+    // Return a context object with the snapshotted value
+    return { previousTodos }
+  },
+  // If the mutation fails, use the context returned from onMutate to roll back
+  onError: (err, newTodo, context) => {
+    queryClient.setQueryData(['todos'], context.previousTodos)
+  },
+  // Always refetch after error or success:
+  onSettled: () => {
+    queryClient.invalidateQueries(['todos'])
+  },
+})
+
+					</code>
+				</pre>
+			</section>
+			<section>
+				<p>
+					Query Cancellation
+				</p>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						<script type="text/template">
+
+						  const query = useQuery(['todos'], async ({ signal }) => {
+						    const resp = await fetch('/todos', { signal })
+						    return resp.json()
+						  })
+						  
+						  const queryClient = useQueryClient()
+						  
+						  return (
+						    <button onClick={(e) => {
+							    e.preventDefault()
+							    queryClient.cancelQueries(['todos'])
+							   }}>Cancel</button>
+						  )
+						</script>
+					</code>
+				</pre>
+			</section>
+			<section>
+				<H2>Scroll Restoration</H2>
+				<p>
+					Out of the box, "scroll restoration" for all queries (including paginated and infinite queries) Just Works™️ in React Query. The reason for this is that query results are cached and able to be retrieved synchronously when a query is rendered. As long as your queries are being cached long enough (the default time is 5 minutes) and have not been garbage collected, scroll restoration will work out of the box all the time.
+				</p>
+			</section>
+			<section>
+				<p>Does React Query replace Redux, MobX?</p>
+				<ul>
+					<li>React Query is a server-state library</li>
+					<li>Redux, MobX, Zustand, etc. are client-state libraries</li>
+				</ul>
+				<p>如果将server相关的状态管理都从redux/mobx中去除掉，那么还剩下什么呢？可能是少数的client-only的全局状态</p>
+				<ul>
+					<li>不冲突</li>
+					<li>互为补充</li>
+					<li>很多项目中有react-query就够了</li>
+				</ul>
+			</section>
+			<section>
+				<h2>Demo演示</h2>
 			</section>
 			<section>
 				Thank You
