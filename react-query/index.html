@@ -589,6 +589,77 @@ useMutation(updateTodo, {
 				</pre>
 			</section>
 			<section>
+				<h3>structural sharing</h3>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						<script type="text/template">
+[
+  { "id": 1, "name": "Learn React", "status": "active" },
+  { "id": 2, "name": "Learn React Query", "status": "todo" }
+]
+
+						</script>
+					</code>
+				</pre>
+
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						<script type="text/template">
+[
+-  { "id": 1, "name": "Learn React", "status": "active" },
++  { "id": 1, "name": "Learn React", "status": "done" },
+  { "id": 2, "name": "Learn React Query", "status": "todo" }
+]
+						</script>
+					</code>
+				</pre>
+			</section>
+			<section>
+				<h3>structural sharing</h3>
+				<pre>
+					<code data-trim data-noescape  class="js" data-line-numbers>
+						<script type="text/template">
+							/**
+							* This function returns `a` if `b` is deeply equal.
+							* If not, it will replace any deeply equal children of `b` with those of `a`.
+							* This can be used for structural sharing between JSON values for example.
+							*/
+							export function replaceEqualDeep(a: any, b: any): any {
+								if (a === b) {
+								  return a
+								}
+							  
+								const array = Array.isArray(a) && Array.isArray(b)
+							  
+								if (array || (isPlainObject(a) && isPlainObject(b))) {
+								  const aSize = array ? a.length : Object.keys(a).length
+								  const bItems = array ? b : Object.keys(b)
+								  const bSize = bItems.length
+								  const copy: any = array ? [] : {}
+							  
+								  let equalItems = 0
+							  
+								  for (let i = 0; i < bSize; i++) {
+								    const key = array ? i : bItems[i]
+								    copy[key] = replaceEqualDeep(a[key], b[key])
+								    if (copy[key] === a[key]) {
+									  equalItems++
+								    }
+								  }
+							  
+								  return aSize === bSize && equalItems === aSize ? a : copy
+								}
+							  
+								return b
+							}
+							  
+
+						</script>
+					</code>
+				</pre>
+
+			</section>
+			<section>
 				<H2>Scroll Restoration</H2>
 				<p>
 					Out of the box, "scroll restoration" for all queries (including paginated and infinite queries) Just Works™️ in React Query. The reason for this is that query results are cached and able to be retrieved synchronously when a query is rendered. As long as your queries are being cached long enough (the default time is 5 minutes) and have not been garbage collected, scroll restoration will work out of the box all the time.
